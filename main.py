@@ -70,7 +70,6 @@ class Circle:
         
         return shapes
 
-
     def radiusLabel(self):
         if self.params.var1 == 'n' and self.params.var2 == 'n':
             return []
@@ -299,6 +298,7 @@ class Circle:
 
         #### labeling angle measure #####
 
+        ####  ERRORS   ####
         angmeas=0.5*(abs(self.params.var9-self.params.var11))
         vec1len=(1+(self.mch1)**2)**0.5
         vec2len=(1+(self.mch2)**2)**0.5
@@ -309,7 +309,7 @@ class Circle:
         uvcx=uv1x+uv2x
         uvcy=uv1y+uv2y
         angbism=uvcy/uvcx
-        dist2lab=2
+        dist2lab=1.75
         hd1=((dist2lab**2)/(1+angbism**2))**0.5
         vd1=angbism*hd1
         hd2=(-1)*hd1
@@ -329,10 +329,158 @@ class Circle:
 
         return None
 
+    def chord1(self):
+        ch1x= 5*math.cos((90-self.params.var26)*math.pi/180)
+        ch1y= 5*math.sin((90-self.params.var26)*math.pi/180)
+        ch2x= 5*math.cos((90-self.params.var27)*math.pi/180)
+        ch2y= 5*math.sin((90-self.params.var27)*math.pi/180)
 
+        string12 = f"polygon(({ch1x}, {ch1y}), ({ch2x}, {ch2y}))"
+        self.output['data'].append(
+                    {'type': 'polygon', 
+                    'string': string12, 
+                    'label': None, 
+                    'showPoint': True, 
+                    'fontSize': '1.5',
+                    'color': 'black'}
+                    )
+    
+    def chord2(self):
+        ch1x= 5*math.cos((90-self.params.var28)*math.pi/180)
+        ch1y= 5*math.sin((90-self.params.var28)*math.pi/180)
+        ch2x= 5*math.cos((90-self.params.var29)*math.pi/180)
+        ch2y= 5*math.sin((90-self.params.var29)*math.pi/180)
+
+        string12 = f"polygon(({ch1x}, {ch1y}), ({ch2x}, {ch2y}))"
+        self.output['data'].append(
+                    {'type': 'polygon', 
+                    'string': string12, 
+                    'label': None, 
+                    'showPoint': True, 
+                    'fontSize': '1.5',
+                    'color': 'black'}
+                    )
+    
+    def chord3(self):
+        ch1x= 5*math.cos((90-self.params.var30)*math.pi/180)
+        ch1y= 5*math.sin((90-self.params.var30)*math.pi/180)
+        ch2x= 5*math.cos((90-self.params.var31)*math.pi/180)
+        ch2y= 5*math.sin((90-self.params.var31)*math.pi/180)
+
+        string12 = f"polygon(({ch1x}, {ch1y}), ({ch2x}, {ch2y}))"
+        self.output['data'].append(
+                    {'type': 'polygon', 
+                    'string': string12, 
+                    'label': None, 
+                    'showPoint': True, 
+                    'fontSize': '1.5',
+                    'color': 'black'}
+                    )
+    
+    def arc1(self):
+        arc1start = ((90 - self.params.var33) * math.pi / 180) if ((90 - self.params.var33) * math.pi / 180) > 0 else 2 * math.pi + ((90 - self.params.var33) * math.pi / 180)
+        arc1end = ((90 - self.params.var34) * math.pi / 180) if ((90 - self.params.var34) * math.pi / 180) > 0 else 2 * math.pi + ((90 - self.params.var33) * math.pi / 180)
+        
+        string13 = f"r=5{{{arc1start}<theta<{arc1end}}}"
+
+        self.output['data'].append(
+                    {'type': 'equation', 
+                    'string': string13, 
+                    'label': None, 
+                    'showPoint': True, 
+                    'fontSize': '1.5',
+                    'color': self.params.var35}
+                    )
+        
+    def arc2(self):
+        arc1start = ((90 - self.params.var35) * math.pi / 180) if ((90 - self.params.var35) * math.pi / 180) > 0 else 2 * math.pi + ((90 - self.params.var35) * math.pi / 180)
+        arc1end = ((90 - self.params.var36) * math.pi / 180) if ((90 - self.params.var36) * math.pi / 180) > 0 else 2 * math.pi + ((90 - self.params.var35) * math.pi / 180)
+        
+        string13 = f"r=5{{{arc1start}<theta<{arc1end}}}"
+
+        self.output['data'].append(
+                    {'type': 'equation', 
+                    'string': string13, 
+                    'label': None, 
+                    'showPoint': True, 
+                    'fontSize': '1.5',
+                    'color': self.params.var37}
+                    )
+        
+    def centralAngle1(self):
+        larger = False
+        if self.params.var24 == "n":
+            return None
+        if self.params.var24 == "y1":
+            larger = True
+
+        if self.params.var25 == 'deg':
+            label = '[degrees symbol]'
+        else:
+            label = self.params.var25
+        
+        ca1 = (90-self.params.var1)*math.pi/180
+        ca2 = (90-self.params.var2)*math.pi/180
+
+        ca3 = ca1 if ca1 > 0 else 2 * math.pi + ca1
+        ca4 = ca2 if ca2 > 0 else 2 * math.pi + ca2
+        ca5 = ca3 if ca3 < ca4 else ca4
+        ca6 = ca4 if ca5 == ca3 else ca3
+        ca7 = ca6
+        ca8 = 2*math.pi + ca5
+
+        angm1 = (ca6-ca5)*180/math.pi
+        angm2=360-angm1
+
+        if larger:
+            lcax2=1.25*math.cos(0.5*(ca8+ca7))
+            lcay2=1.25*math.sin(0.5*(ca8+ca7))
+            string21 = f"r=1{{{ca7}<theta<{ca8}}}"
+            string22 = f"({lcax2}, {lcay2})"
+            self.output['data'].append(
+                    {'type': 'equation', 
+                    'string': string21, 
+                    'label': None, 
+                    'showPoint': True, 
+                    'fontSize': '1.5',
+                    'color': 'black'}
+                    )
+            self.output['data'].append(
+                    {'type': 'point', 
+                    'string': string22, 
+                    'label': f"{angm2} {label}", 
+                    'showPoint': False, 
+                    'fontSize': '1.5',
+                    'color': 'black'}
+                    )
+
+            
+        else:
+            lcax1 = 1.25*math.cos(0.5*(ca6+ca5))
+            lcay1 = 1.25*math.sin(0.5*(ca6+ca5))
+            string19 = f"r=1{{{ca5}<theta<{ca6}}}"
+            string20 = f"({lcax1}, {lcay1})"
+            self.output['data'].append(
+                    {'type': 'equation', 
+                    'string': string19, 
+                    'label': None, 
+                    'showPoint': True, 
+                    'fontSize': '1.5',
+                    'color': 'black'}
+                    )
+            self.output['data'].append(
+                    {'type': 'point', 
+                    'string': string20, 
+                    'label': f"{angm1} {label}", 
+                    'showPoint': False, 
+                    'fontSize': '1.5',
+                    'color': 'black'}
+                    )
+
+        
 class Draw:
     """returns a list of strings to be inputted into Desmos for the required shape and parameters"""
-    def __init__(self, shape, params) -> None:
+    def __init__(self, params) -> None:
         pass
 
 import json

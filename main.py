@@ -32,6 +32,17 @@ class Circle:
         self.arcx2 = None
         self.stringenough1 = None
         self.string3or4 = None
+        self.xmax1 = None
+        self.xmax1 = None
+        self.xmin2 = None
+        self.pch1 = None
+        self.pch2 = None
+        self.poi1ab = None
+
+        self.abx1 = None
+        self.aby1 = None
+        self.bex1 = None
+        self.bey2 = None
 
     def radius(self):
         if self.params.var1 == 'n' and self.params.var2 == 'n':
@@ -214,9 +225,6 @@ class Circle:
         else:
             self.arcx2 = self.intx2
 
-
-
-
         if ((self.insangy2 < self.insangy1 and self.insangy2 < self.insangy3) or (self.insangy2 > self.nsangy1 and self.insangy2 > self.insangy3)):
             self.stringenough1 = True
         else:
@@ -224,11 +232,91 @@ class Circle:
 
 
         if self.stringenough == 1 and self.insangy2 < self.insangy1:
-            string3or4 = self.string3
+            arc = f"y-({self.insangy2}) = (2.25-(x-({self.insangx2}))^2)^0.5{{{self.arcx1}<=x<={self.arcx2}}}"
+
         else:
-            string3or4 = self.string4
+            arc = f"y-({self.insangy2}) = (-1)*(2.25-(x-({self.insangx2}))^2)^0.5{{{self.arcx1}<=x<={self.arcx2}}}"
+
+        chord1 = f'polygon(({self.insangx1}, {self.insangy1}),({self.insangx2}, {self.insangy2}))'
+        chord2 = f'polygon(({self.insangx3}, {self.insangy3}),({self.insangx2}, {self.insangy2}))'
+        
+        
+
+        string1 = {'type': 'polygon', 'string': chord1, 'label': None, 'showPoint': True, 'fontSize': None, "color": "black"}
+        string2 = {'type': 'polygon', 'string': chord2, 'label': None, 'showPoint': True, 'fontSize': None, "color": "black"}
+        string3 = {'type': 'equation', 'string': arc, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+        
+        if self.stringenough1:
+            self.output.append(string1, string2, string3)
+            return None
+        else:
+            self.output.append(string1, string2)
+        
+
+        
+        ##### One arc not enough ######
+
+        self.xmax1 = self.insangx2 + 1.5
+        self.xmin2 = self.insangx2 - 1.5
+        self.pch1 = self.xmax1 - .001
+        self.pch2 = self.xmin2 + .001
+        self.poi1ab = True if self.inty1 > self.inty2 else False
+
+        self.abx1 = self.intx1 if self.poi1ab == 1 else self.intx2
+        self.aby1 = self.inty1 if self.poi1ab == 1 else self.inty2
+        self.bex1 = self.intx2 if self.abx1 == self.intx1 else self.intx1
+        self.bey2 = self.inty2 if self.aby1 == self.inty1 else self.inty1
 
 
+        string5=f"y-({self.insangy2})=(2.25-(x-({self.insangx2}))^2)^0.5{{{self.abx1}<=x<={self.xmax1}}}"
+        string6=f"y-({self.insangy2})=(-1)*(2.25-(x-({self.insangx2}))^2)^0.5{{{self.bex1}<=x<={self.xmax1}}}"
+        string7=f"(x-({self.insangx2}))^2+(y-({self.insangy2}))^2=2.25{{x>{self.pch1}}}"
+        string8=f"y-({self.insangy2})=(2.25-(x-({self.insangx2}))^2)^0.5{{{self.xmin2}<=x<={self.abx1}}}"
+        string9=f"y-({self.insangy2})=(2.25-(x-({self.insangx2}))^2)^0.5{{{self.xmin2}<=x<={self.bex1}}}"
+        string10=f"(x-({self.insangx2}))^2+(y-({self.insangy2}))^2=2.25{{x<{self.pch2}}}"
+
+        if self.insangx2 < 0:
+            out5 = {'type': 'polygon', 'string': string5, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+            out6 = {'type': 'polygon', 'string': string6, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+            out7 = {'type': 'equation', 'string': string7, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+            self.output.append(out5, out6, out7)
+        else:
+            out8 = {'type': 'polygon', 'string': string8, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+            out9 = {'type': 'polygon', 'string': string9, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+            out10 = {'type': 'equation', 'string': string10, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+            self.output.append(out8, out9, out10)
+
+        #### labeling angle measure #####
+
+        angmeas=0.5*(math.abs(self.params.var9-self.params.var11))
+        vec1len=(1+(self.mch1)^2)^0.5
+        vec2len=(1+(self.mch2)^2)^0.5
+        uv1x=1/vec1len
+        uv1y=self.mch1/vec1len
+        uv2x=1/vec2len
+        uv2y=self.mch2/vec2len
+        uvcx=uv1x+uv2x
+        uvcy=uv1y+uv2y
+        angbism=uvcy/uvcx
+        dist2lab=1.75
+        hd1=((dist2lab^2)/(1+angbism^2))^0.5
+        vd1=angbism*hd1
+        hd2=(-1)*hd1
+        vd2=angbism*hd2
+        lx1=self.insangx2+hd1
+        ly1=self.insangy2+vd1
+        lx2=self.insangx2+hd2
+        ly2=self.insangy2+vd2
+
+        locx = lx1 if (lx1**2 + ly1**2) < 25 else lx2
+        locy = ly1 if (lx1**2 + ly1**2) < 25 else ly2
+
+        string11 = f"({locx}, {locy})"
+        out11 = {'type': 'point', 'string': string11, 'label': f"{angmeas} [degree symbol]", 'showPoint': False, 'fontSize': 1.5, "color": "black"}
+
+        self.output.append(out11)
+
+        return None
 class Draw:
     """returns a list of strings to be inputted into Desmos for the required shape and parameters"""
     def __init__(self, shape, params) -> None:

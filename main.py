@@ -1,4 +1,5 @@
 import math
+from helpers import Params
 
 class Circle:
     def __init__(self, params) -> None:
@@ -53,7 +54,7 @@ class Circle:
         self.x1 = 5 * math.cos((90 - self.params.var1) * math.pi/180)
         self.y1 = 5 * math.sin((90 - self.params.var1) * math.pi/180)
         
-        if self.params.var2 == 'n':
+        if not self.params.var2 or self.params.var2 == 'n':
             out = {'type': 'polygon', 'string': f'polygon((0, 0), ({self.x1}, {self.y1}))', 'label': None, 'showPoint': None, 'fontSize': None}
             self.output['data'].append(out)
             return out
@@ -79,33 +80,34 @@ class Circle:
         label5 = None if self.params.var5 == 'n' or not self.params.var5 else self.params.var5
         label6 = None if self.params.var6 == 'n' or not self.params.var6 else self.params.var6
 
+        self.mr1 = self.y1/self.x1
+        if self.y2 and self.x2: 
+            self.mr2 = self.y2/self.x2
+            self.mpr2x = self.x2/2
+            self.mpr2y = self.y2/2       
+        self.mpr1x = self.x1/2
+        self.mpr1y = self.y1/2
+
+
+        if self.mr1 > 0:
+            self.lx1 = self.mpr1x + 0.5 * math.cos(math.atan(-1/self.mr1))
+            self.ly1 = self.mpr1y - 0.5 * math.sin(math.atan(-1/self.mr1))
+        elif self.mr1 < 0:
+            self.lx1 = self.mpr1x - 0.5 * math.cos(math.atan(-1/self.mr1))
+            self.ly1 = self.mpr1y - 0.5 * math.sin(math.atan(-1/self.mr1))
+        elif self.mr1 == 0:
+            self.lx1 = self.mpr1x 
+            self.ly1 = self.mpr1y - 0.25      
+        elif self.x1 == 0:
+            self.lx1 = self.mpr1x + 0.25
+            self.ly1 = self.mpr1y
 
         if self.params.var2 == 'n' or not self.params.var2:
-            self.mr1 = self.y1/self.x1
-            self.mr2 = self.y2/self.x2       #need to have error catch incase any of these are None
-
-            self.mpr1x = self.x1/2
-            self.mpr1y = self.y1/2
-            self.mpr2x = self.x2/2
-            self.mpr2y = self.y2/2
-
-            if self.mr1 > 0:
-                self.lx1 = self.mpr1x + 0.5 * math.cos(math.atan(-1/self.mr1))
-                self.ly1 = self.mpr1y - 0.5 * math.sin(math.atan(-1/self.mr1))
-            elif self.mr1 < 0:
-                self.lx1 = self.mpr1x - 0.5 * math.cos(math.atan(-1/self.mr1))
-                self.ly1 = self.mpr1y - 0.5 * math.sin(math.atan(-1/self.mr1))
-            elif self.mr1 == 0:
-                self.lx1 = self.mpr1x 
-                self.ly1 = self.mpr1y - 0.25      
-            elif self.x1 == 0:
-                self.lx1 = self.mpr1x + 0.25
-                self.ly1 = self.mpr1y
 
             if label3:
                 self.output['data'].append(
                     {'type': 'point', 
-                    'string': f'({self.lx1}, {self.ly2})', 
+                    'string': f'({self.lx1}, {self.ly1})', 
                     'label': label3, 
                     'showPoint': False, 
                     'fontSize': '1.5'})
@@ -158,7 +160,7 @@ class Circle:
                 self.output['data'].append(
                     {'type': 'point', 
                     'string': f'({self.lx2}, {self.ly2})', 
-                    'label': label3, 
+                    'label': label4, 
                     'showPoint': False, 
                     'fontSize': '1.5'})
             if label5:
@@ -179,7 +181,7 @@ class Circle:
                 self.output['data'].append(
                     {'type': 'point', 
                     'string': f'({self.x2}, {self.y2})', 
-                    'label': label6, 
+                    'label': label7, 
                     'showPoint': False, 
                     'fontSize': '1.5'})
     
@@ -225,13 +227,15 @@ class Circle:
         else:
             self.arcx2 = self.intx2
 
+
+
         if ((self.insangy2 < self.insangy1 and self.insangy2 < self.insangy3) or (self.insangy2 > self.nsangy1 and self.insangy2 > self.insangy3)):
             self.stringenough1 = True
         else:
             self.stringenough1 = False
 
 
-        if self.stringenough == 1 and self.insangy2 < self.insangy1:
+        if self.stringenough1 and self.insangy2 < self.insangy1:
             arc = f"y-({self.insangy2}) = (2.25-(x-({self.insangx2}))^2)^0.5{{{self.arcx1}<=x<={self.arcx2}}}"
 
         else:
@@ -247,50 +251,57 @@ class Circle:
         string3 = {'type': 'equation', 'string': arc, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
         
         if self.stringenough1:
-            self.output.append(string1, string2, string3)
-            return None
+            self.output['data'].append(string1)
+            self.output['data'].append(string2)
+            self.output['data'].append(string3)
+            
         else:
-            self.output.append(string1, string2)
+            self.output['data'].append(string1)
+            self.output['data'].append(string2)
         
 
         
         ##### One arc not enough ######
 
-        self.xmax1 = self.insangx2 + 1.5
-        self.xmin2 = self.insangx2 - 1.5
-        self.pch1 = self.xmax1 - .001
-        self.pch2 = self.xmin2 + .001
-        self.poi1ab = True if self.inty1 > self.inty2 else False
+            self.xmax1 = self.insangx2 + 1.5
+            self.xmin2 = self.insangx2 - 1.5
+            self.pch1 = self.xmax1 - .001
+            self.pch2 = self.xmin2 + .001
+            self.poi1ab = True if self.inty1 > self.inty2 else False
 
-        self.abx1 = self.intx1 if self.poi1ab == 1 else self.intx2
-        self.aby1 = self.inty1 if self.poi1ab == 1 else self.inty2
-        self.bex1 = self.intx2 if self.abx1 == self.intx1 else self.intx1
-        self.bey2 = self.inty2 if self.aby1 == self.inty1 else self.inty1
+            self.abx1 = self.intx1 if self.poi1ab == 1 else self.intx2
+            self.aby1 = self.inty1 if self.poi1ab == 1 else self.inty2
+            self.bex1 = self.intx2 if self.abx1 == self.intx1 else self.intx1
+            self.bey2 = self.inty2 if self.aby1 == self.inty1 else self.inty1
 
 
-        string5=f"y-({self.insangy2})=(2.25-(x-({self.insangx2}))^2)^0.5{{{self.abx1}<=x<={self.xmax1}}}"
-        string6=f"y-({self.insangy2})=(-1)*(2.25-(x-({self.insangx2}))^2)^0.5{{{self.bex1}<=x<={self.xmax1}}}"
-        string7=f"(x-({self.insangx2}))^2+(y-({self.insangy2}))^2=2.25{{x>{self.pch1}}}"
-        string8=f"y-({self.insangy2})=(2.25-(x-({self.insangx2}))^2)^0.5{{{self.xmin2}<=x<={self.abx1}}}"
-        string9=f"y-({self.insangy2})=(2.25-(x-({self.insangx2}))^2)^0.5{{{self.xmin2}<=x<={self.bex1}}}"
-        string10=f"(x-({self.insangx2}))^2+(y-({self.insangy2}))^2=2.25{{x<{self.pch2}}}"
+            string5=f"y-({self.insangy2})=(2.25-(x-({self.insangx2}))^2)^0.5{{{self.abx1}<=x<={self.xmax1}}}"
+            string6=f"y-({self.insangy2})=(-1)*(2.25-(x-({self.insangx2}))^2)^0.5{{{self.bex1}<=x<={self.xmax1}}}"
+            string7=f"(x-({self.insangx2}))^2+(y-({self.insangy2}))^2=2.25{{x>{self.pch1}}}"
+            string8=f"y-({self.insangy2})=(2.25-(x-({self.insangx2}))^2)^0.5{{{self.xmin2}<=x<={self.abx1}}}"
+            string9=f"y-({self.insangy2})=(2.25-(x-({self.insangx2}))^2)^0.5{{{self.xmin2}<=x<={self.bex1}}}"
+            string10=f"(x-({self.insangx2}))^2+(y-({self.insangy2}))^2=2.25{{x<{self.pch2}}}"
 
-        if self.insangx2 < 0:
-            out5 = {'type': 'polygon', 'string': string5, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
-            out6 = {'type': 'polygon', 'string': string6, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
-            out7 = {'type': 'equation', 'string': string7, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
-            self.output.append(out5, out6, out7)
-        else:
-            out8 = {'type': 'polygon', 'string': string8, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
-            out9 = {'type': 'polygon', 'string': string9, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
-            out10 = {'type': 'equation', 'string': string10, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
-            self.output.append(out8, out9, out10)
+            if self.insangx2 < 0:
+                out5 = {'type': 'polygon', 'string': string5, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+                out6 = {'type': 'polygon', 'string': string6, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+                out7 = {'type': 'equation', 'string': string7, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+                self.output['data'].append(out5)
+                self.output['data'].append(out6)
+                self.output['data'].append(out7)
+            else:
+                out8 = {'type': 'polygon', 'string': string8, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+                out9 = {'type': 'polygon', 'string': string9, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+                out10 = {'type': 'equation', 'string': string10, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+                self.output['data'].append(out8)
+                self.output['data'].append(out9)
+                self.output['data'].append(out10)
 
         #### labeling angle measure #####
 
-        angmeas=0.5*(math.abs(self.params.var9-self.params.var11))
-        vec1len=(1+(self.mch1)^2)^0.5
-        vec2len=(1+(self.mch2)^2)^0.5
+        angmeas=0.5*(abs(self.params.var9-self.params.var11))
+        vec1len=(1+(self.mch1)**2)**0.5
+        vec2len=(1+(self.mch2)**2)**0.5
         uv1x=1/vec1len
         uv1y=self.mch1/vec1len
         uv2x=1/vec2len
@@ -298,8 +309,8 @@ class Circle:
         uvcx=uv1x+uv2x
         uvcy=uv1y+uv2y
         angbism=uvcy/uvcx
-        dist2lab=1.75
-        hd1=((dist2lab^2)/(1+angbism^2))^0.5
+        dist2lab=2
+        hd1=((dist2lab**2)/(1+angbism**2))**0.5
         vd1=angbism*hd1
         hd2=(-1)*hd1
         vd2=angbism*hd2
@@ -314,10 +325,25 @@ class Circle:
         string11 = f"({locx}, {locy})"
         out11 = {'type': 'point', 'string': string11, 'label': f"{angmeas} [degree symbol]", 'showPoint': False, 'fontSize': 1.5, "color": "black"}
 
-        self.output.append(out11)
+        self.output['data'].append(out11)
 
         return None
+
+
 class Draw:
     """returns a list of strings to be inputted into Desmos for the required shape and parameters"""
     def __init__(self, shape, params) -> None:
         pass
+
+import json
+def main():
+    f = open('params.json')
+    params_json = json.load(f)
+    params = Params(params_json)
+    newCircle = Circle(params)
+    newCircle.inscribedAngle1()
+    print(newCircle.output)
+
+
+if __name__ == "__main__":
+    main()

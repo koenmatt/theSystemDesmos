@@ -228,12 +228,13 @@ class Circle:
 
 
 
-        if ((self.insangy2 < self.insangy1 and self.insangy2 < self.insangy3) or (self.insangy2 > self.nsangy1 and self.insangy2 > self.insangy3)):
+        if ((self.insangy2 < self.insangy1 and self.insangy2 < self.insangy3) or (self.insangy2 > self.insangy1 and self.insangy2 > self.insangy3)):
             self.stringenough1 = True
         else:
             self.stringenough1 = False
 
 
+        #BUG
         if self.stringenough1 and self.insangy2 < self.insangy1:
             arc = f"y-({self.insangy2}) = (2.25-(x-({self.insangx2}))^2)^0.5{{{self.arcx1}<=x<={self.arcx2}}}"
 
@@ -384,7 +385,7 @@ class Circle:
 
 
 
-        if ((self.insangy2 < self.insangy1 and self.insangy2 < self.insangy3) or (self.insangy2 > self.nsangy1 and self.insangy2 > self.insangy3)):
+        if ((self.insangy2 < self.insangy1 and self.insangy2 < self.insangy3) or (self.insangy2 > self.insangy1 and self.insangy2 > self.insangy3)):
             self.stringenough1 = True
         else:
             self.stringenough1 = False
@@ -644,7 +645,7 @@ class Circle:
                     'color': 'black'}
                     )
 
-        
+         
 class Draw:
     """returns a list of strings to be inputted into Desmos for the required shape and parameters"""
     def __init__(self, params) -> None:

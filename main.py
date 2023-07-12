@@ -340,6 +340,167 @@ class Circle:
 
         return None
 
+    def inscribedAngle2(self):
+        if self.params.var16 == 'n' or not self.params.var8:
+            return None
+        
+        self.insangx1 = 5 * math.cos((90-self.params.var17)* math.pi / 180)
+        self.insangy1 = 5 * math.sin((90-self.params.var17)* math.pi / 180)
+        self.insangx2 = 5 * math.cos((90-self.params.var18)* math.pi / 180)
+        self.insangy2 = 5 * math.sin((90-self.params.var18)* math.pi / 180)
+        self.insangx3 = 5 * math.cos((90-self.params.var19)* math.pi / 180)
+        self.insangy3 = 5 * math.sin((90-self.params.var19)* math.pi / 180)
+
+        self.mch1 = (self.insangy2 - self.insangy1) / (self.insangx2 - self.insangx1)
+        self.mch2 = (self.insangy3 - self.insangy2) / (self.insangx3 - self.insangx2)
+
+        if self.insangx1 > self.insangx2: 
+            self.dx1 = ((2.25/((self.mch1 ** 2) + 1)) ** 0.5)
+        else:
+            self.dx1 = ((2.25/((self.mch1 ** 2) + 1)) ** 0.5) * -1
+        
+        self.dy1 = self.dx1 * self.mch1
+        self.intx1 = self.insangx2 + self.dx1
+        self.inty1 = self.insangy2 + self.dy1
+
+        if self.insangx3 > self.insangx2: 
+            self.dx2 = ((2.25/((self.mch2 ** 2) + 1)) ** 0.5)
+        else:
+            self.dx2 = ((2.25/((self.mch2 ** 2) + 1)) ** 0.5) * -1
+        
+        self.dy2 = self.dx2 * self.mch2
+        self.intx2 = self.insangx2 + self.dx2
+        self.inty2 = self.insangy2 + self.dy2
+
+        if self.intx1 < self.intx2:
+            self.arcx1 = self.intx1
+        else:
+            self.arcx1 = self.intx2
+        
+        if self.arcx1 == self.intx2:
+            self.arcx2 = self.intx1
+        else:
+            self.arcx2 = self.intx2
+
+
+
+        if ((self.insangy2 < self.insangy1 and self.insangy2 < self.insangy3) or (self.insangy2 > self.nsangy1 and self.insangy2 > self.insangy3)):
+            self.stringenough1 = True
+        else:
+            self.stringenough1 = False
+
+
+        if self.stringenough1 and self.insangy2 < self.insangy1:
+            arc = f"y-({self.insangy2}) = (2.25-(x-({self.insangx2}))^2)^0.5{{{self.arcx1}<=x<={self.arcx2}}}"
+
+        else:
+            arc = f"y-({self.insangy2}) = (-1)*(2.25-(x-({self.insangx2}))^2)^0.5{{{self.arcx1}<=x<={self.arcx2}}}"
+
+        chord1 = f'polygon(({self.insangx1}, {self.insangy1}),({self.insangx2}, {self.insangy2}))'
+        chord2 = f'polygon(({self.insangx3}, {self.insangy3}),({self.insangx2}, {self.insangy2}))'
+        
+        
+
+        string1 = {'type': 'polygon', 'string': chord1, 'label': None, 'showPoint': True, 'fontSize': None, "color": "black"}
+        string2 = {'type': 'polygon', 'string': chord2, 'label': None, 'showPoint': True, 'fontSize': None, "color": "black"}
+        string3 = {'type': 'equation', 'string': arc, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+        
+        if self.stringenough1:
+            self.output['data'].append(string1)
+            self.output['data'].append(string2)
+            self.output['data'].append(string3)
+            
+        else:
+            self.output['data'].append(string1)
+            self.output['data'].append(string2)
+        
+
+        
+        ##### One arc not enough ######
+
+            self.xmax1 = self.insangx2 + 1.5
+            self.xmin2 = self.insangx2 - 1.5
+            self.pch1 = self.xmax1 - .001
+            self.pch2 = self.xmin2 + .001
+            self.poi1ab = True if self.inty1 > self.inty2 else False
+
+            self.abx1 = self.intx1 if self.poi1ab == 1 else self.intx2
+            self.aby1 = self.inty1 if self.poi1ab == 1 else self.inty2
+            self.bex1 = self.intx2 if self.abx1 == self.intx1 else self.intx1
+            self.bey2 = self.inty2 if self.aby1 == self.inty1 else self.inty1
+
+
+            string5=f"y-({self.insangy2})=(2.25-(x-({self.insangx2}))^2)^0.5{{{self.abx1}<=x<={self.xmax1}}}"
+            string6=f"y-({self.insangy2})=(-1)*(2.25-(x-({self.insangx2}))^2)^0.5{{{self.bex1}<=x<={self.xmax1}}}"
+            string7=f"(x-({self.insangx2}))^2+(y-({self.insangy2}))^2=2.25{{x>{self.pch1}}}"
+            string8=f"y-({self.insangy2})=(2.25-(x-({self.insangx2}))^2)^0.5{{{self.xmin2}<=x<={self.abx1}}}"
+            string9=f"y-({self.insangy2})=(2.25-(x-({self.insangx2}))^2)^0.5{{{self.xmin2}<=x<={self.bex1}}}"
+            string10=f"(x-({self.insangx2}))^2+(y-({self.insangy2}))^2=2.25{{x<{self.pch2}}}"
+
+            if self.insangx2 < 0:
+                out5 = {'type': 'polygon', 'string': string5, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+                out6 = {'type': 'polygon', 'string': string6, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+                out7 = {'type': 'equation', 'string': string7, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+                self.output['data'].append(out5)
+                self.output['data'].append(out6)
+                self.output['data'].append(out7)
+            else:
+                out8 = {'type': 'polygon', 'string': string8, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+                out9 = {'type': 'polygon', 'string': string9, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+                out10 = {'type': 'equation', 'string': string10, 'label': None, 'showPoint': True, 'fontSize': None, "color": "red"}
+                self.output['data'].append(out8)
+                self.output['data'].append(out9)
+                self.output['data'].append(out10)
+
+        #### labeling angle measure #####
+
+        ####  ERRORS   ####
+        angmeas=0.5*(abs(self.params.var17-self.params.var19))
+        vec1len=(1+(self.mch1)**2)**0.5
+        vec2len=(1+(self.mch2)**2)**0.5
+        uv1x=1/vec1len
+        uv1y=self.mch1/vec1len
+        uv2x=1/vec2len
+        uv2y=self.mch2/vec2len
+        uvcx=uv1x+uv2x
+        uvcy=uv1y+uv2y
+
+        vec1x = self.insangx1-self.insangx2
+        vec1y = self.insangy1-self.insangy2
+        vec2x = self.insangx3-self.insangx2
+        vec2y = self.insangy3-self.insangy2
+
+        vec1length = (vec1x**2 + vec1y**2) **.5
+        vec2length = (vec2x**2 + vec2y**2) **.5
+        angbisx = vec2length*vec1x+vec1length*vec2x
+        angbisy = vec2length*vec1y+vec1length*vec2y
+        angbism = angbisy / angbisx
+        dist2lab = 2 if self.insangx2<0 else 2.5
+
+        hd1=((dist2lab**2)/(1+angbism**2))**0.5
+        vd1=angbism*hd1
+        hd2=(-1)*hd1
+        vd2=angbism*hd2
+        lx1=self.insangx2+hd1
+        ly1=self.insangy2+vd1
+        lx2=self.insangx2+hd2
+        ly2=self.insangy2+vd2
+
+        locx = lx1 if (lx1**2 + ly1**2) < 25 else lx2
+        locy = ly1 if (lx1**2 + ly1**2) < 25 else ly2
+
+        string11 = f"({locx}, {locy})"
+        out11 = {'type': 'point', 'string': string11, 'label': f"{angmeas} [degree symbol]", 'showPoint': False, 'fontSize': 1.5, "color": "black"}
+
+        self.output['data'].append(out11)
+
+        return None
+
+
+
+
+
+
     def chord1(self):
         ch1x= 5*math.cos((90-self.params.var26)*math.pi/180)
         ch1y= 5*math.sin((90-self.params.var26)*math.pi/180)

@@ -308,8 +308,19 @@ class Circle:
         uv2y=self.mch2/vec2len
         uvcx=uv1x+uv2x
         uvcy=uv1y+uv2y
-        angbism=uvcy/uvcx
-        dist2lab=1.75
+
+        vec1x = self.insangx1-self.insangx2
+        vec1y = self.insangy1-self.insangy2
+        vec2x = self.insangx3-self.insangx2
+        vec2y = self.insangy3-self.insangy2
+
+        vec1length = (vec1x**2 + vec1y**2) **.5
+        vec2length = (vec2x**2 + vec2y**2) **.5
+        angbisx = vec2length*vec1x+vec1length*vec2x
+        angbisy = vec2length*vec1y+vec1length*vec2y
+        angbism = angbisy / angbisx
+        dist2lab = 2 if self.insangx2<0 else 2.5
+
         hd1=((dist2lab**2)/(1+angbism**2))**0.5
         vd1=angbism*hd1
         hd2=(-1)*hd1

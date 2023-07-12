@@ -496,11 +496,6 @@ class Circle:
 
         return None
 
-
-
-
-
-
     def chord1(self):
         ch1x= 5*math.cos((90-self.params.var26)*math.pi/180)
         ch1y= 5*math.sin((90-self.params.var26)*math.pi/180)
